@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <title>
+            Kanji Mnemonics
+        </title>
+    </head>
+    <body>
+        <form method="POST" action="">
+            {% csrf_token %}
+            First name: <input type = "text" name = "kanji" />
+            <input type="submit" name="transaction_add"/>
+        </form>
+        <br>
+        <br>
+        {% if strokes %}
+            Strokes: {{ strokes}}
+        {% endif %}
+    </body>
+</html>
