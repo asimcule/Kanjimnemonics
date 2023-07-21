@@ -7,16 +7,18 @@ from .models import Kanji
 # Create your views here.
 def home(request):
     if request.method == 'POST':
-        unicode = ord(request.POST['kanji'])
-        kanji = Kanji.objects.filter(unicode=unicode).values()
-        print(kanji[0]['unicode'])
         try:
-            strokes = kanji[0]['strokes']
-        except IndexError as e:
-            print(e)
-        return render(request, 'home/index.html', {'strokes': strokes})
+            unicode = ord(request.POST['kanji'])
+            try:
+                kanji = Kanji.objects.filter(unicode=unicode).values()
+                print(kanji[0]['unicode'])
+                strokes = kanji[0]['strokes']
+                return render(request, 'home/index.html', {'strokes': strokes})
+            except IndexError as e:
+                print(e)
+                return render(request, 'home/index.html')
+        except TypeError:
+            return render(request, 'home/index.html')
         
-        # print(chr(kanji[0]['unicode']))
-
     else:
         return render(request, 'home/index.html')

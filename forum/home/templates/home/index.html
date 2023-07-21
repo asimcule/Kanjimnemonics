@@ -7,13 +7,15 @@
     <body>
         <form method="POST" action="">
             {% csrf_token %}
-            First name: <input type = "text" name = "kanji" />
+            Kanji: <input type = "text" name = "kanji" />
             <input type="submit" name="transaction_add"/>
         </form>
         <br>
         <br>
         {% if strokes %}
-            Strokes: {{ strokes}}
+            Strokes: {{ strokes }}
+        {% else %}
+            Kanji NOT FOUND in the database!
         {% endif %}
     </body>
 </html>
