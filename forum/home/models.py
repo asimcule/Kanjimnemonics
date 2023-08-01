@@ -2,5 +2,25 @@ from django.db import models
 
 # Create your models here.
 class Kanji(models.Model):
-    unicode = models.IntegerField()
-    strokes = models.IntegerField()
+    id = models.IntegerField(primary_key=True)
+    kanji = models.TextField(max_length=20, null=False)
+    grade = models.IntegerField(null = True)
+    stroke_count = models.IntegerField(null=True)
+    frequency = models.IntegerField(null=True)
+    jlpt = models.IntegerField(null=True)
+
+
+class Onyomi(models.Model):
+    kanji_id = models.ForeignKey(Kanji, null=True, on_delete=models.CASCADE)
+    character = models.TextField(max_length=20, null = True)
+
+
+class Kunyoumi(models.Model):
+    kanji_id = models.ForeignKey(Kanji, null=True, on_delete=models.CASCADE)
+    character = models.TextField(max_length=20, null = True)
+
+
+class Meanings(models.Model):
+    kanji_id = models.ForeignKey(Kanji, null=True, on_delete=models.CASCADE)
+    character = models.TextField(max_length=100, null = True)
+

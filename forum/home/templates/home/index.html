@@ -12,8 +12,16 @@
         </form>
         <br>
         <br>
-        {% if strokes %}
-            Strokes: {{ strokes }}
+        {% if stroke_count %}
+            Kanji: {{ kanji }}
+            <br>
+            Strokes: {{ stroke_count }}
+            <br>
+            Grade: {{ grade }}
+            <br>      
+            Frequency: {{ frequency }}
+            <br>
+            JLPT Level: {{ jlpt }}
         {% else %}
             Kanji NOT FOUND in the database!
         {% endif %}
