@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <title>
+            Kanji Mnemonics
+        </title>
+        <style>
+            .card {
+              box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+              transition: 0.3s;
+              width: 40%;
+            }
+            
+            .card:hover {
+              box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+            }
+            
+            .container {
+              padding: 2px 16px;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <a href="{% url 'homepage' %}"> homepage </a>
+        <br>
+        <br>
+        <form method="POST" action="">
+            {% csrf_token %}
+            Kanji: <input type = "text" name = "kanji" />
+            <input type="submit" name="transaction_add"/>
+        </form>
+        <br>
+        <br>
+        <div class="card">
+            <div class="container">
+                {% if stroke_count %}
+                    <h4> <b> Kanji: {{ kanji }} </b></h4>
+                    <h4> <b> Strokes: {{ stroke_count }} </b></h4>
+                    <h4> <b> JLPT Level: {{ jlpt }} </b></h4>
+                    <h4> <b>Onyomi:
+                    {% for item in onyomi %}
+                        {{ item }}  ,
+                    {% endfor %}
+                    </b> </h4>
+
+                    <h4> <b> Kunyoumi:
+                    {% for item in kunyoumi %}
+                        {{ item }}  ,
+                    {% endfor %}
+                    </b> </h4>
+
+                    <h4> <b>
+                    Meanings:
+                    {% for item in meanings %}
+                        {{ item }}  ,
+                    {% endfor %}
+                    </b> </h4>
+                {% else %}
+                    <p> Kanji NOT AVAILABLE in the database </p>
+                {% endif %}
+            </div>
+        </div>
+    </body>
+</html>
