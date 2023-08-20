@@ -32,9 +32,8 @@
           },
           success: function (json) {
             console.log(json);
-            var likeCountSpan = $("#likeCount_" + postid);
-            var currentCount = parseInt(likeCountSpan.text());
-            likeCountSpan.text(currentCount + 1);
+            document.getElementById("likeCount_"+postid).innerHTML = json['upvotes']
+            
           },
           error: function (xhr, errmsg, err) {},
         });
@@ -49,15 +48,18 @@
   <br />
   <h1>Homepage</h1>
 
-  {% if display_data %} {% for post in display_data %}
+  {% if display_data %} 
+  {% for post in display_data %}
   <div class="card">
     <div class="container">
       <h4><b> Kanji: {{ post.kanji }} </b></h4>
       <h4><b> Stroke Count: {{ post.strokes }} </b></h4>
       <h4>
         <b>
-          Meanings: {% for meaning in post.meanings %} {{ meaning }}, {% endfor
-          %}
+          Meanings: 
+          {% for meaning in post.meanings %} 
+          {{ meaning }}, 
+          {% endfor%}
         </b>
       </h4>
 
@@ -69,5 +71,6 @@
       <span id="likeCount_{{ post.id }}">{{ post.upvotes }}</span>
     </div>
   </div>
-  {% endfor %} {% endif %}
+  {% endfor %} 
+  {% endif %}
 </body>

@@ -80,11 +80,10 @@ def homepage(request):
 
 def update_likes(request):
     print(request.POST)
-    # post = Post.objects.get(id=int(request.POST['id'][0]))
-    # post['upvotes'] =+ 1
-    # post.save()
-    # print(post)
-    # post.upvotes += 1
-    # post.save()
-    return JsonResponse({})
+    post = Post.objects.get(id=int(request.POST['postid'][0]))
+    post.save()
+    print(post)
+    post.upvotes += 1
+    post.save()
+    return JsonResponse({"upvotes": post.upvotes})
 
