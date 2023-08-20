@@ -1,84 +1,73 @@
 <!DOCTYPE html>
 <head>
-    <title>
-        Homepage
-    </title>
-    <style>
-        .card {
-          box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-          transition: 0.3s;
-          width: 40%;
-        }
-        
-        .card:hover {
-          box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-        }
-        
-        .container {
-          padding: 2px 30px;
-        }
-    </style>  
+  <title>Homepage</title>
+  <style>
+    .card {
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+      transition: 0.3s;
+      width: 40%;
+    }
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"> </script>
-    <script>
-        $('#myForm').trigger("reset");
+    .card:hover {
+      box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    }
 
-        $(document).on('click', '#like-button', function (e) {
+    .container {
+      padding: 2px 30px;
+    }
+  </style>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $(".like-button").on("click", function (e) {
+        var postid = $(this).val();
         $.ajax({
-            type: 'POST',
-            url: '{% url "update_likes" %}',
-            data: {
-            postid: $('#like-button').val(),
-            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-            action: 'post'
-            },
-            success: function (json) {
-            console.log(json)
-            },
-            error: function (xhr, errmsg, err) {
-
-            }
+          type: "POST",
+          url: '{% url "update_likes" %}',
+          data: {
+            postid: postid,
+            csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+            action: "post",
+          },
+          success: function (json) {
+            console.log(json);
+            var likeCountSpan = $("#likeCount_" + postid);
+            var currentCount = parseInt(likeCountSpan.text());
+            likeCountSpan.text(currentCount + 1);
+          },
+          error: function (xhr, errmsg, err) {},
         });
-})
-    </script>
-
-
-
-
+      });
+    });
+  </script>
 </head>
 
 <body>
-    <a href="{% url 'search' %}"> Search </a>
-    <a href="{% url 'post' %}"> Post </a>
-    <br>
-    <h1> Homepage </h1>
-    
-            {% if display_data %}
-                {% for post in display_data %}
-                    <div class="card">
-                        <div class="container">
-                        <h4> <b> Kanji: {{ post.kanji }} </b></h4>
-                        <h4> <b> Stroke Count: {{ post.strokes }} </b></h4>
-                        <h4> <b> Meanings:
-                        {% for meaning in post.meanings %}
-                            {{ meaning }},
-                        {% endfor %}
-                        </b></h4>
+  <a href="{% url 'search' %}"> Search </a>
+  <a href="{% url 'post' %}"> Post </a>
+  <br />
+  <h1>Homepage</h1>
 
-                        <h4> <b> Mnemonic: {{ post.mnemonic }} </b></h4>
-                            
-                            <button type="submit" id="like-button" value="{{ post.id }}" action="{% url 'update_likes' %}">
-                                {% csrf_token %}
-                                Like
-                            </button>
-                            <span id="likeCount">{{ post.upvotes }}</span>
+  {% if display_data %} {% for post in display_data %}
+  <div class="card">
+    <div class="container">
+      <h4><b> Kanji: {{ post.kanji }} </b></h4>
+      <h4><b> Stroke Count: {{ post.strokes }} </b></h4>
+      <h4>
+        <b>
+          Meanings: {% for meaning in post.meanings %} {{ meaning }}, {% endfor
+          %}
+        </b>
+      </h4>
 
+      <h4><b> Mnemonic: {{ post.mnemonic }} </b></h4>
 
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-
-
+      <button type="button" class="like-button" value="{{ post.id }}">
+        {% csrf_token %} Like
+      </button>
+      <span id="likeCount_{{ post.id }}">{{ post.upvotes }}</span>
+    </div>
+  </div>
+  {% endfor %} {% endif %}
 </body>
