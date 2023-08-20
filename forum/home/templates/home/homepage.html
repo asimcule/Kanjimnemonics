@@ -42,9 +42,6 @@
 })
     </script>
 
-
-
-
 </head>
 
 <body>
@@ -67,13 +64,11 @@
 
                         <h4> <b> Mnemonic: {{ post.mnemonic }} </b></h4>
                             
-                            <button type="submit" id="like-button" value="{{ post.id }}" action="{% url 'update_likes' %}">
+                            <button type="submit" class="like-button" value="{{ post.id }}" action="{% url 'update_likes' %}">
                                 {% csrf_token %}
                                 Like
                             </button>
                             <span id="likeCount">{{ post.upvotes }}</span>
-
-
                         </div>
                     </div>
                 {% endfor %}
