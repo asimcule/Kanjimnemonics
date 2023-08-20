@@ -3,6 +3,8 @@ from .form import Postform
 from django.shortcuts import render, HttpResponse, redirect
 from .models import Kanji, Onyomi, Kunyoumi, Meanings, Post
 from django.contrib import messages
+from django.http import JsonResponse
+import logging
 
 # Create your views here.
 def post(request):
@@ -31,7 +33,6 @@ def search(request):
             
             try:
                 kanji = Kanji.objects.filter(kanji=kanji).values()
-                # print(kanji[0]['unicode'])
                 id = kanji[0]["id"]
                 character = kanji[0]['kanji']
                 stroke_count = kanji[0]['stroke_count']
@@ -54,7 +55,7 @@ def search(request):
                 return render(request, 'home/search.html', {'stroke_count': stroke_count, "grade": grade, "frequency": frequency, "kanji": character, "jlpt": jlpt, "onyomi": onyomi_list, "kunyoumi": kunyoumi_list, "meanings": meanings_list})
             
             except IndexError as e:
-                print(e)
+                logging.error(e)
                 return render(request, 'home/search.html')
         
         except TypeError:
@@ -65,15 +66,25 @@ def search(request):
 
 
 def homepage(request):
+    if request.method == 'POST':
+        print(request.POST)
     posts = Post.objects.all().order_by('-created').values()
     display_data = []
-    print(posts)
     for post in posts:
         input_kanji = post['kanji']
         kanji_info = Kanji.objects.filter(kanji=input_kanji).values()
-        print(kanji_info)
         meanings = Meanings.objects.filter(kanji_key_id=kanji_info[0]['id']).values()
-        print
-        display_data.append({"kanji":input_kanji, "strokes": kanji_info[0]['stroke_count'], "meanings": [a['character'] for a in meanings], "mnemonic":post['mnemonic']})
-
+        display_data.append({"id": post['id'], "kanji":input_kanji, "strokes": kanji_info[0]['stroke_count'], "meanings": [a['character'] for a in meanings], "mnemonic":post['mnemonic'], "upvotes":post['upvotes']})
     return render(request, 'home/homepage.html', {'display_data': display_data})
+
+
+def update_likes(request):
+    print(request.POST)
+    # post = Post.objects.get(id=int(request.POST['id'][0]))
+    # post['upvotes'] =+ 1
+    # post.save()
+    # print(post)
+    # post.upvotes += 1
+    # post.save()
+    return JsonResponse({})
+
