@@ -16,7 +16,6 @@
       padding: 2px 30px;
     }
   </style>
-
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script>
     $(document).ready(function () {
@@ -43,34 +42,68 @@
 </head>
 
 <body>
-  <a href="{% url 'search' %}"> Search </a>
-  <a href="{% url 'post' %}"> Post </a>
+
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'homepage' %}">Kanji Mnemonics</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'homepage' %}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'search' %}">Search</a>
+          </li>
+          {% if authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+          </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'post' %}">Post</a>
+          </li>
+          {% if authenticated %}
+           {{ user }}
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'login' %}">Login</a>
+          </li>
+            Anonymous
+          {% endif %}
+        </ul>
+  
+      </div>
+    </div>
+
   <br />
-  <h1>Homepage</h1>
 
   {% if display_data %} 
-  {% for post in display_data %}
-  <div class="card">
-    <div class="container">
-      <h4><b> Kanji: {{ post.kanji }} </b></h4>
-      <h4><b> Stroke Count: {{ post.strokes }} </b></h4>
-      <h4>
-        <b>
-          Meanings: 
-          {% for meaning in post.meanings %} 
-          {{ meaning }}, 
-          {% endfor%}
-        </b>
-      </h4>
+    {% for post in display_data %}
+    <div class="card">
+      <div class="container">
+        <h4><b> Posted By: {{ post.poster }} </b></h4>
+        <h4><b> Kanji: {{ post.kanji }} </b></h4>
+        <h4><b> Stroke Count: {{ post.strokes }} </b></h4>
+        <h4>
+          <b>
+            Meanings: 
+            {% for meaning in post.meanings %} 
+            {{ meaning }}, 
+            {% endfor %}
+          </b>
+        </h4>
 
-      <h4><b> Mnemonic: {{ post.mnemonic }} </b></h4>
+        <h4><b> Mnemonic: {{ post.mnemonic }} </b></h4>
 
-      <button type="button" class="like-button" value="{{ post.id }}">
-        {% csrf_token %} Like
-      </button>
-      <span id="likeCount_{{ post.id }}">{{ post.upvotes }}</span>
+        <button type="button" class="like-button" value="{{ post.id }}">
+          {% csrf_token %} Like
+        </button>
+        <span id="likeCount_{{ post.id }}">{{ post.upvotes }}</span>
+      </div>
     </div>
-  </div>
-  {% endfor %} 
+    {% endfor %} 
   {% endif %}
 </body>

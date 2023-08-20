@@ -1,21 +1,27 @@
 from django.shortcuts import render
 from .form import Postform
 from django.shortcuts import render, HttpResponse, redirect
-from .models import Kanji, Onyomi, Kunyoumi, Meanings, Post
+from .models import Kanji, Onyomi, Kunyoumi, Meanings, Post, Likes
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 import logging
 
 # Create your views here.
+@login_required(login_url='login')
 def post(request):
     form = Postform()
     if request.method == 'POST':
+        username = request.user
+        user_id = User.objects.get(username=username)
         input_kanji = request.POST['kanji']
         input_mnemonic = request.POST['mnemonic']
         kanji = Kanji.objects.filter(kanji=input_kanji).values()
+        print(user_id)
         if kanji:
             # Means the kanji is valid and available in the master kanji database
-            post = Post(kanji=input_kanji, mnemonic=input_mnemonic)
+            post = Post(poster_id=user_id, kanji=input_kanji, mnemonic=input_mnemonic)
             post.save()
         else:
             messages.error(request, "No kanji found")
@@ -30,7 +36,6 @@ def search(request):
     if request.method == 'POST':
         try:
             kanji = request.POST['kanji']
-            
             try:
                 kanji = Kanji.objects.filter(kanji=kanji).values()
                 id = kanji[0]["id"]
@@ -66,24 +71,51 @@ def search(request):
 
 
 def homepage(request):
-    if request.method == 'POST':
-        print(request.POST)
+    display_data = get_posts_by_date()
+    if request.user.is_authenticated:
+        return render(request, 'home/homepage.html', {'display_data': display_data, "authenticated": True, "user": request.user})
+    else:
+        return render(request, 'home/homepage.html', {'display_data': display_data, "authenticated": False})
+        
+
+@login_required(login_url='login')
+def update_likes(request):
+    if request.user.is_authenticated:
+        user_id = User.objects.get(username=request.user)
+        post_id = Post.objects.get(id=request.POST['postid'][0])
+        is_liked = Likes.objects.filter(user=user_id.id, post=post_id.id)
+        if is_liked:
+            print("Already Liked!")
+            like_update = Likes.objects.get(user=user_id, post=post_id)
+            like_update.delete ()
+            post = Post.objects.get(id=post_id.id)
+            post.upvotes -= 1
+            post.save()
+            return JsonResponse({"upvotes": post.upvotes})
+        
+        else:
+            like_update = Likes(user=user_id, post=post_id)
+            like_update.save()
+            post = Post.objects.get(id=int(request.POST['postid'][0]))
+            post.upvotes += 1
+            post.save()
+            return JsonResponse({"upvotes": post.upvotes})
+    else:
+        return redirect('login')
+
+
+def get_posts_by_date():
     posts = Post.objects.all().order_by('-created').values()
     display_data = []
     for post in posts:
+        poster = User.objects.filter(id=post['poster_id_id']).values()[0]['username']
         input_kanji = post['kanji']
         kanji_info = Kanji.objects.filter(kanji=input_kanji).values()
         meanings = Meanings.objects.filter(kanji_key_id=kanji_info[0]['id']).values()
-        display_data.append({"id": post['id'], "kanji":input_kanji, "strokes": kanji_info[0]['stroke_count'], "meanings": [a['character'] for a in meanings], "mnemonic":post['mnemonic'], "upvotes":post['upvotes']})
-    return render(request, 'home/homepage.html', {'display_data': display_data})
+        display_data.append({"id": post['id'], 'poster': poster, "kanji":input_kanji, "strokes": kanji_info[0]['stroke_count'], "meanings": [a['character'] for a in meanings], "mnemonic":post['mnemonic'], "upvotes":post['upvotes']})
+
+    return display_data
 
 
-def update_likes(request):
-    print(request.POST)
-    post = Post.objects.get(id=int(request.POST['postid'][0]))
-    post.save()
-    print(post)
-    post.upvotes += 1
-    post.save()
-    return JsonResponse({"upvotes": post.upvotes})
-
+def get_posts_by_upvotes():
+    pass
