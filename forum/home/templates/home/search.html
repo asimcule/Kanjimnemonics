@@ -33,26 +33,26 @@
         <br>
         <div class="card">
             <div class="container">
-                {% if stroke_count %}
-                    <h4> <b> Kanji: {{ kanji }} </b></h4>
-                    <h4> <b> Strokes: {{ stroke_count }} </b></h4>
-                    <h4> <b> JLPT Level: {{ jlpt }} </b></h4>
+                {% if kanji %}
+                    <h4> <b> Kanji: {{ kanji.kanji }} </b></h4>
+                    <h4> <b> Strokes: {{ kanji.stroke_count }} </b></h4>
+                    <h4> <b> JLPT Level: {{ kanji.jlpt }} </b></h4>
                     <h4> <b>Onyomi:
-                    {% for item in onyomi %}
-                        {{ item }}  ,
+                    {% for items in onyomi %}
+                        {{ items.character }},
                     {% endfor %}
                     </b> </h4>
 
                     <h4> <b> Kunyoumi:
-                    {% for item in kunyoumi %}
-                        {{ item }}  ,
+                    {% for items in kunyoumi %}
+                        {{ items.character }},
                     {% endfor %}
                     </b> </h4>
 
                     <h4> <b>
                     Meanings:
-                    {% for item in meanings %}
-                        {{ item }}  ,
+                    {% for items in meanings %}
+                        {{ items.character }},
                     {% endfor %}
                     </b> </h4>
                 {% else %}

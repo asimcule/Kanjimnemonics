@@ -37,6 +37,27 @@ def search(request):
         try:
             kanji = request.POST['kanji']
             try:
+                kanji = Kanji.objects.get(kanji=kanji)
+                onyomi = Onyomi.objects.filter(kanji_key_id=kanji.id)
+                kunyoumi = Kunyoumi.objects.filter(kanji_key_id=kanji.id)
+                meanings = Meanings.objects.filter(kanji_key_id=kanji.id)
+                print(onyomi)
+                return render(request, 'home/search.html', {"kanji":kanji, "onyomi":onyomi, "kunyoumi":kunyoumi, "meanings":meanings})
+            except IndexError as e:
+                logging.error(e)
+                return render(request, 'home/search.html')
+        except TypeError as e:
+            print(e)
+            return render(request, 'home/search.html') 
+    else:
+        return render(request, 'home/search.html')
+    
+
+def search_dummy(request):
+    if request.method == 'POST':
+        try:
+            kanji = request.POST['kanji']
+            try:
                 kanji = Kanji.objects.filter(kanji=kanji).values()
                 id = kanji[0]["id"]
                 character = kanji[0]['kanji']
@@ -71,7 +92,7 @@ def search(request):
 
 
 def homepage(request):
-    display_data = get_posts_by_date()
+    display_data = get_posts()
     if request.user.is_authenticated:
         return render(request, 'home/homepage.html', {'display_data': display_data, "authenticated": True, "user": request.user})
     else:
@@ -104,17 +125,9 @@ def update_likes(request):
         return redirect('login')
 
 
-def get_posts_by_date():
-    posts = Post.objects.all().order_by('-created').values()
-    display_data = []
-    for post in posts:
-        poster = User.objects.filter(id=post['poster_id_id']).values()[0]['username']
-        input_kanji = post['kanji']
-        kanji_info = Kanji.objects.filter(kanji=input_kanji).values()
-        meanings = Meanings.objects.filter(kanji_key_id=kanji_info[0]['id']).values()
-        display_data.append({"id": post['id'], 'poster': poster, "kanji":input_kanji, "strokes": kanji_info[0]['stroke_count'], "meanings": [a['character'] for a in meanings], "mnemonic":post['mnemonic'], "upvotes":post['upvotes']})
-
-    return display_data
+def get_posts():
+    posts = Post.objects.all().order_by('-created')
+    return posts
 
 
 def get_posts_by_upvotes():
