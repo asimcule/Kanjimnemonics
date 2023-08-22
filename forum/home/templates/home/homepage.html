@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <head>
   <title>Homepage</title>
+
   <style>
     .card {
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
@@ -16,6 +17,7 @@
       padding: 2px 30px;
     }
   </style>
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script>
     $(document).ready(function () {
@@ -31,7 +33,15 @@
           },
           success: function (json) {
             console.log(json);
-            document.getElementById("likeCount_"+postid).innerHTML = json['upvotes']
+            if (jQuery.isEmptyObject(json))
+            {
+              console.log("False");
+              window.location.replace("{% url 'login' %}")
+            }
+            else
+            {
+              document.getElementById("likeCount_"+postid).innerHTML = json['upvotes']
+            }
             
           },
           error: function (xhr, errmsg, err) {},
@@ -42,7 +52,6 @@
 </head>
 
 <body>
-
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
       <a class="navbar-brand" href="{% url 'homepage' %}">Kanji Mnemonics</a>
@@ -77,16 +86,15 @@
   
       </div>
     </div>
-
-  <br />
+  <br/>
 
   {% if display_data %} 
     {% for post in display_data %}
     <div class="card">
       <div class="container">
-        <h4><b> Posted By: {{ post.poster }} </b></h4>
+        <h4><b> Posted By: {{ post.posted_by }} </b></h4>
         <h4><b> Kanji: {{ post.kanji }} </b></h4>
-        <h4><b> Stroke Count: {{ post.strokes }} </b></h4>
+        <h4><b> Stroke Count: {{ post.stroke_count }} </b></h4>
         <h4>
           <b>
             Meanings: 
@@ -95,13 +103,13 @@
             {% endfor %}
           </b>
         </h4>
-
         <h4><b> Mnemonic: {{ post.mnemonic }} </b></h4>
 
-        <button type="button" class="like-button" value="{{ post.id }}">
-          {% csrf_token %} Like
+        <button type="button" class="like-button" value="{{ post.post_id }}">
+          {% csrf_token %} 
+          Like
         </button>
-        <span id="likeCount_{{ post.id }}">{{ post.upvotes }}</span>
+        <span id="likeCount_{{ post.post_id }}">{{ post.upvotes }}</span>
       </div>
     </div>
     {% endfor %} 
